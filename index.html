@@ -1,16 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
     <title>Document</title>
-</head>
-<body>
+  </head>
+  <body>
+    <h1>Image Compression using Huffman Coding</h1>
+    <div class="buttons">
+      <h2>Upload an image</h2>
+      <input type="file" id="file" accept="image/*" />
+      <button id="upload">Upload</button>
+      <button id="compress">Compress</button>
+      <button id="decompress">Decompress</button>
+    </div>
+    <div class="ui">
+      <img class="img" alt="dog" src="dog.png"  />
+      <canvas>
 
-    <img src="dog.png" alt="dog" >
-    <canvas></canvas>
+      </canvas>
+    </div>
+    <script src="file.js"></script>
+    <script src="huffman.js"></script>
     <script src="app.js"></script>
-    
-</body>
+  </body>
 </html>

@@ -8,171 +8,115 @@ function convertToBinaryString(number) {
   return binary;
 }
 
-console.log(convertToBinaryString(16));
-
-class HuffmanNode {
-  constructor(data, frequency, left, right) {
-    this.data = data;
-    this.frequency = frequency;
-    this.left = left;
-    this.right = right;
-  }
-}
-
-class HuffmanCoding {
-  constructor(data) {
-    this.data = data;
-    this.frequency = {};
-    this.codes = {};
-    this.encoded = [];
-    this.decoded = [];
-    this.getFrequency();
-    this.getCodes();
-    this.encode();
-    this.decode();
-    // this.getTree();
-  }
-
-  getFrequency() {
-    this.data.forEach((byte) => {
-      if (this.frequency[byte]) {
-        this.frequency[byte]++;
-      } else {
-        this.frequency[byte] = 1;
-      }
-    });
-
-    return this.frequency;
-  }
-
-  getTotalFrequency() {
-    return Object.values(this.frequency).reduce((a, b) => {
-      return a + b;
-    });
-  }
-
-  getCodes() {
-    const sorted = Object.entries(this.frequency).sort((a, b) => {
-      return a[1] - b[1];
-    });
-
-    //convert to HuffmanNode
-    let nodes = [];
-    // console.log(sorted);
-    sorted.forEach((node, index) => {
-      nodes.push(new HuffmanNode(node[0], node[1], null, null));
-    });
-    // console.table(sorted);
-    // console.log(this.getTotalFrequency());
-    const tree = this.buildTree(nodes);
-    // console.log(tree);
-
-    this.buildCodes(tree);
-  }
-
-  buildTree(sorted) {
-    //build tree until freqeusncy is equal to total frequency
-    while (sorted[0].frequency < this.getTotalFrequency()) {
-      //get first two nodes
-      const left = sorted.shift();
-      const right = sorted.shift();
-      //create new node
-      const newNode = new HuffmanNode(
-        null,
-        left.frequency + right.frequency,
-        left,
-        right
-      );
-      //insert new node in sorted array
-      sorted.push(newNode);
-      //sort array
-      sorted.sort((a, b) => {
-        return a.frequency - b.frequency;
-      });
-    }
-
-    return sorted[0];
-  }
-
-  // getTree() {
-  //   const tree = this.buildTree(this.data);
-  //   console.log(tree);
-  // }
-
-  buildCodes(root, code = "") {
-    if (root.data !== null) {
-      this.codes[root.data] = { data: root.data, code: code };
-      //   console.log(root)
-    } else {
-      this.buildCodes(root.left, code + "0");
-      this.buildCodes(root.right, code + "1");
-    }
-  }
-
-  encode() {
-    this.data.forEach((byte) => {
-      this.encoded.push(this.codes[byte]);
-    });
-  }
-
-  decode() {
-    this.decoded = this.encoded.map((item) => {
-      //convert to integer
-      return parseInt(item.data);
-    });
-  }
-}
-
-
+// console.log(convertToBinaryString(16));
+const dpi = window.devicePixelRatio;
+const target = 300;
 
 const image = document.getElementsByTagName("img")[0];
-console.log(image);
+image.style.width = `${target}px`;
+image.style.height = `${target}px`;
 
-//set image width and height to match the actual image size
-image.width = image.naturalWidth * 0.5;
-image.height = image.naturalHeight * 0.5;
+// hide the image
+// image.style.display = "none";
 
+// console.log(image);
 const canvas = document.getElementsByTagName("canvas")[0];
-canvas.width = image.naturalWidth * 0.5;
-canvas.height = image.naturalHeight * 0.5;
-const dpi = window.devicePixelRatio;
-
 const ctx = canvas.getContext("2d");
 
+function copyToCanvas() {
+  canvas.width = target * window.devicePixelRatio;
+  canvas.height = target * window.devicePixelRatio;
 
-function fix_dpi() {
-  //create a style object that returns width and height
-  let style = {
-    height() {
-      return +getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
-    },
-    width() {
-      return +getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
-    },
-  };
-  //set the correct attributes for a crystal clear image!
-  canvas.setAttribute("width", style.width() * dpi);
-  canvas.setAttribute("height", style.height() * dpi);
+  canvas.style.width = `${target}px`;
+  canvas.style.height = `${target}px`;
+
+  const img = new Image();
+  img.src = image.src;
+  canvas.imageSmoothingEnabled = false;
+  ctx.drawImage(img, 0, 0, image.width * dpi, image.height * dpi);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  console.log(imageData.data);
 }
 
-// fix_dpi();
+const compress_button = document.getElementById("compress");
+compress_button.addEventListener("click", () => {
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  // //appply huffman coding
+  const huffman = new HuffmanCoding(imageData.data);
+
+  // //encode image data
+  const encoded = huffman.encoded;
+  console.log(encoded);
+
+  // //make a string of encoded data
+  const encodedString = encoded
+    .map((byte) => {
+      return byte.code;
+    })
+    .join("");
+
+  console.log("Encoded string", encodedString);
+
+  // //get 8 char long chunks of encoded data and convert to numbers
+  const encodedData = [];
+  for (let i = 0; i < encodedString.length; i += 8) {
+    encodedData.push(parseInt(encodedString.slice(i, i + 8), 2));
+  }
+
+  console.log("Encoded data", encodedData);
+
+  //store the data in a binary file
+  const blob = new Blob([new Uint8Array(encodedData)], {
+    type: "application/octet-stream",
+  });
+
+  //download the file
+  const link = document.createElement("a");
+  link.href = window.URL.createObjectURL(blob);
+  link.download = "compressed.bin";
+  link.click();
+  document.body.appendChild(link);
+
+  // const test = encodedData[0];
+
+  //get binary value of test using inbuilt function
+  // const bin = test.toString(2);
+  // console.log(bin);
+
+  // //get back the image from the array of numbers
+// let binaryString = "";
+// for (let i = 0; i < encodedData.length; i++) {
+//   binaryString += convertToBinaryString(encodedData[i]);
+// }
+
+// console.log("Binary string", binaryString);
+
+
+});
+
+
+
+const decompress_button = document.getElementById("decompress");
+decompress_button.addEventListener("click", () => {
+  //get the file
+  const file = document.getElementById("file").files[0];
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(file);
+  reader.onload = () => {
+    const data = new Uint8Array(reader.result);
+    console.log(data);
+    //decode the data
+  }
+});
 
 
 
 
 
-const img = new Image();
-img.src = image.src;
-canvas.imageSmoothingEnabled = false;
-ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
 //get rgb values of each pixel
-const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 //print canvas width in px
 
-console.log(imageData.data);
-
-// const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 // //get base64 encoded image data
 // const base64 = canvas.toDataURL("image/png");
 // //get image data as array of bytes
@@ -184,74 +128,44 @@ console.log(imageData.data);
 // }
 // console.log(data);
 
-// //appply huffman coding
-const huffman = new HuffmanCoding(imageData.data);
 
-// //encode image data
-const encoded = huffman.encoded;
-console.log(encoded);
 
-// //make a string of encoded data
-const encodedString = encoded
-  .map((byte) => {
-    return byte.code;
-  })
-  .join("");
+// // convert back to number array
+// const decodedData = [];
+// for (let i = 0; i < binaryString.length; i += 8) {
+//   decodedData.push(parseInt(binaryString.slice(i, i + 8), 2));
+// }
 
-console.log("Encoded string", encodedString);
+// console.log("Decoded data", decodedData);
 
-// //get 8 char long chunks of encoded data and convert to numbers
-const encodedData = [];
-for (let i = 0; i < encodedString.length; i += 8) {
-  encodedData.push(parseInt(encodedString.slice(i, i + 8), 2));
-}
+// huffman.decode();
 
-console.log("Encoded data", encodedData);
+// console.log(huffman.decoded);
+
+// // change each data value by +5
+// // for (let i = 0; i < huffman.decoded.length; i++) {
+// //     huffman.decoded[i] = huffman.decoded[i] + 120 ;
+// // }
+
+// ctx.putImageData(
+//   new ImageData(
+//     new Uint8ClampedArray(huffman.decoded),
+//     canvas.width,
+//     canvas.height
+//   ),
+//   0,
+//   0
+// );
+
+// const newImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+// console.log(newImageData.data);
 
 // //get back the image from the array of numbers
-let binaryString = "";
-for (let i = 0; i < encodedData.length; i++) {
-  binaryString += convertToBinaryString(encodedData[i]);
-}
-
-console.log("Binary string", binaryString);
-
-// convert back to number array
-const decodedData = [];
-for (let i = 0; i < binaryString.length; i += 8) {
-  decodedData.push(parseInt(binaryString.slice(i, i + 8), 2));
-}
-
-console.log("Decoded data", decodedData);
-
-huffman.decode();
-
-console.log(huffman.decoded);
-
-// change each data value by +5
-// for (let i = 0; i < huffman.decoded.length; i++) {
-//     huffman.decoded[i] = huffman.decoded[i] + 120 ;
-// }
-
-ctx.putImageData(
-  new ImageData(
-    new Uint8ClampedArray(huffman.decoded),
-    canvas.width,
-    canvas.height
-  ),
-  0,
-  0
-);
-
-const newImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-console.log(newImageData.data);
-
-//get back the image from the array of numbers
-// const binary = data.map((byte) => {
-//     return String.fromCharCode(byte);
-// }
-// ).join('');
-// const base64String = btoa(binary);
-// const img2 = new Image();
-// img2.src = 'data:image/png;base64,' + base64String;
-// document.body.appendChild(img2);
+// // const binary = data.map((byte) => {
+// //     return String.fromCharCode(byte);
+// // }
+// // ).join('');
+// // const base64String = btoa(binary);
+// // const img2 = new Image();
+// // img2.src = 'data:image/png;base64,' + base64String;
+// // document.body.appendChild(img2);
