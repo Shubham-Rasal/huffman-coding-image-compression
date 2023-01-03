@@ -88,7 +88,8 @@ class HuffmanCoding {
 
   buildCodes(root, code = "") {
     if (root.data !== null) {
-      this.codes[root.data] = { data: root.data, code: code };
+      // this.codes[root.data] = { data: root.data, code: code };
+      this.codes[root.data] = code;
       //   console.log(root)
     } else {
       this.buildCodes(root.left, code + "0");
@@ -97,14 +98,18 @@ class HuffmanCoding {
   }
 
   encode() {
+    // console.log(this.data.length)
+
     this.data.forEach((byte) => {
-      this.encoded += this.codes[byte].code;
+      this.encoded += this.codes[byte];
     });
   }
 
   decode() {
     //traverse tree and get data
     let current = this.getTree();
+    let counter = 0;
+
     for (let i = 0; i < this.encoded.length; i++) {
       if (this.encoded[i] === "0") {
         current = current.left;
@@ -113,10 +118,13 @@ class HuffmanCoding {
       }
 
       if (current.left === null && current.right === null) {
-        this.decoded.push(current.data);
+        this.decoded.push(parseInt(current.data));
         current = this.getTree();
+        counter++;
       }
     }
+
+    console.log("Counter", counter);
 
     return this.decoded;
   }

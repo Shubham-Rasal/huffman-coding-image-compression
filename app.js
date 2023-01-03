@@ -1,4 +1,6 @@
 console.log("Hello World");
+const zip = new JSZip();
+console.log("zip", zip);
 
 function convertToBinaryString(number) {
   let binary = number.toString(2);
@@ -47,8 +49,8 @@ compress_button.addEventListener("click", () => {
   // //encode image data
   const encodedString = huffman.encoded;
   console.log("Encoded", encodedString);
+  console.log("Encoded length", encodedString.length);
 
-  
   // //get 8 char long chunks of encoded data and convert to numbers
   const encodedData = [];
   for (let i = 0; i < encodedString.length; i += 8) {
@@ -57,26 +59,36 @@ compress_button.addEventListener("click", () => {
 
   console.log("Encoded data", encodedData);
 
-  const decodedData = huffman.decode();
-  console.log("Original data", imageData.data.length);
-  console.log("Decoded data", decodedData.length);
+  const decodedData = huffman.decoded;
+
+  console.log("Decoded data", decodedData);
 
   //store the data in a binary file
   const blob = new Blob([new Uint8Array(encodedData)], {
     type: "application/octet-stream",
   });
 
+  //store the codes in a json file
+  const codes = JSON.stringify(huffman.codes);
+  const codesBlob = new Blob([codes], {
+    type: "application/json",
+  });
 
-  //store the 
+  //make a zip file of the binary file and the json file
 
+  //download the codes
+  // const codesLink = document.createElement("a");
+  // codesLink.href = window.URL.createObjectURL(codesBlob);
+  // codesLink.download = "codes.json";
+  // codesLink.innerText = "Download Codes";
+  // document.body.appendChild(codesLink);
 
-
-  //download the file
-  const link = document.createElement("a");
-  link.href = window.URL.createObjectURL(blob);
-  link.download = "compressed.bin";
-  // link.click();
-  document.body.appendChild(link);
+  // //download the file
+  // const link = document.createElement("a");
+  // link.href = window.URL.createObjectURL(blob);
+  // link.download = "compressed.bin";
+  // link.innerText = "Download";
+  // document.body.appendChild(link);
 
   // const test = encodedData[0];
 
@@ -85,17 +97,13 @@ compress_button.addEventListener("click", () => {
   // console.log(bin);
 
   // //get back the image from the array of numbers
-// let binaryString = "";
-// for (let i = 0; i < encodedData.length; i++) {
-//   binaryString += convertToBinaryString(encodedData[i]);
-// }
+  // let binaryString = "";
+  // for (let i = 0; i < encodedData.length; i++) {
+  //   binaryString += convertToBinaryString(encodedData[i]);
+  // }
 
-// console.log("Binary string", binaryString);
-
-
+  // console.log("Binary string", binaryString);
 });
-
-
 
 const decompress_button = document.getElementById("decompress");
 decompress_button.addEventListener("click", () => {
@@ -107,13 +115,8 @@ decompress_button.addEventListener("click", () => {
     const data = new Uint8Array(reader.result);
     console.log(data);
     //decode the data
-  }
+  };
 });
-
-
-
-
-
 
 //get rgb values of each pixel
 //print canvas width in px
@@ -128,8 +131,6 @@ decompress_button.addEventListener("click", () => {
 //   data[i] = bytes.charCodeAt(i);
 // }
 // console.log(data);
-
-
 
 // // convert back to number array
 // const decodedData = [];
