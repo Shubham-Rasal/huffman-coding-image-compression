@@ -45,18 +45,10 @@ compress_button.addEventListener("click", () => {
   const huffman = new HuffmanCoding(imageData.data);
 
   // //encode image data
-  const encoded = huffman.encoded;
-  console.log(encoded);
+  const encodedString = huffman.encoded;
+  console.log("Encoded", encodedString);
 
-  // //make a string of encoded data
-  const encodedString = encoded
-    .map((byte) => {
-      return byte.code;
-    })
-    .join("");
-
-  console.log("Encoded string", encodedString);
-
+  
   // //get 8 char long chunks of encoded data and convert to numbers
   const encodedData = [];
   for (let i = 0; i < encodedString.length; i += 8) {
@@ -65,16 +57,25 @@ compress_button.addEventListener("click", () => {
 
   console.log("Encoded data", encodedData);
 
+  const decodedData = huffman.decode();
+  console.log("Original data", imageData.data.length);
+  console.log("Decoded data", decodedData.length);
+
   //store the data in a binary file
   const blob = new Blob([new Uint8Array(encodedData)], {
     type: "application/octet-stream",
   });
 
+
+  //store the 
+
+
+
   //download the file
   const link = document.createElement("a");
   link.href = window.URL.createObjectURL(blob);
   link.download = "compressed.bin";
-  link.click();
+  // link.click();
   document.body.appendChild(link);
 
   // const test = encodedData[0];

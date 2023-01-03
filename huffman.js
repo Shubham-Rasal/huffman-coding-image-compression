@@ -10,9 +10,10 @@ class HuffmanNode {
 class HuffmanCoding {
   constructor(data) {
     this.data = data;
+    this.tree = null;
     this.frequency = {};
     this.codes = {};
-    this.encoded = [];
+    this.encoded = "";
     this.decoded = [];
     this.getFrequency();
     this.getCodes();
@@ -51,6 +52,7 @@ class HuffmanCoding {
     });
 
     const tree = this.buildTree(nodes);
+    this.tree = tree;
 
     this.buildCodes(tree);
   }
@@ -79,7 +81,10 @@ class HuffmanCoding {
     return sorted[0];
   }
 
-  
+  //get tree
+  getTree() {
+    return this.tree;
+  }
 
   buildCodes(root, code = "") {
     if (root.data !== null) {
@@ -93,14 +98,26 @@ class HuffmanCoding {
 
   encode() {
     this.data.forEach((byte) => {
-      this.encoded.push(this.codes[byte]);
+      this.encoded += this.codes[byte].code;
     });
   }
 
   decode() {
-    this.decoded = this.encoded.map((item) => {
-      //convert to integer
-      return parseInt(item.data);
-    });
+    //traverse tree and get data
+    let current = this.getTree();
+    for (let i = 0; i < this.encoded.length; i++) {
+      if (this.encoded[i] === "0") {
+        current = current.left;
+      } else {
+        current = current.right;
+      }
+
+      if (current.left === null && current.right === null) {
+        this.decoded.push(current.data);
+        current = this.getTree();
+      }
+    }
+
+    return this.decoded;
   }
 }
