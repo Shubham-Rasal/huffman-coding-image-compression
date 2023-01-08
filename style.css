@@ -1,58 +1,53 @@
-
-
-body{
-    margin: 0;
-    padding: 0;
-    background-color: teal;
-    height: 100vh;
-    width: 100vw;
-
+body {
+  margin: 0;
+  padding: 0;
+  background-color: teal;
+  height: 100vh;
+  width: 100vw;
 }
 
 body::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
-
 h1 {
-    color: white;
-    text-align: center;
-    font-size: 50px;
-    margin: 0;
-    padding: 0;
-    padding-top: 20px;
+  color: white;
+  text-align: center;
+  font-size: 50px;
+  margin: 0;
+  padding: 0;
+  padding-top: 20px;
 }
 
 h2 {
-    color: white;
-    text-align: center;
-    font-size: 30px;
-    margin: 0;
-    padding: 0;
-    padding-top: 20px;
+  color: white;
+  text-align: center;
+  font-size: 30px;
+  margin: 0;
+  padding: 0;
+  padding-top: 20px;
 }
 
 button {
-    background-color: white;
-    color: teal;
-    font-size: 20px;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 10px;
-    cursor: pointer;
+  background-color: white;
+  color: teal;
+  font-size: 20px;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+  cursor: pointer;
 }
 
-
 input {
-    background-color: white;
-    color: teal;
-    font-size: 20px;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 10px;
-    cursor: pointer;
+  background-color: white;
+  color: teal;
+  font-size: 20px;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+  cursor: pointer;
 }
 
 /* 
@@ -60,51 +55,60 @@ make the choose file button drag and drop
 */
 
 input::-webkit-file-upload-button {
-    background-color: teal;
-    color: white;
-    border: 10px;
-    border-radius: 5px;
-    padding: 10px;
-    border-color: teal;
-    font-size: 20px;
-    border: none;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 10px;
-    cursor: pointer;
+  background-color: teal;
+  color: white;
+  border: 10px;
+  border-radius: 5px;
+  padding: 10px;
+  border-color: teal;
+  font-size: 20px;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px;
+  cursor: pointer;
 }
 
-canvas{
-    height: 100%;
-    width: 100%;
+canvas {
+  background-color: white;
+  border: 10px solid teal;
+  border-radius: 5px;
+  margin: 10px;
+  padding: 10px;
+  width: 300px;
+  height: 300px;
+  z-index: 80;
 }
 
-.ui{
-    position: relative;
-   
-    width: 100%;
-    height: 100%;
-    /* background-color: rebeccapurple; */
-    margin: 10px;
+img {
+  width: 70%;
+  object-fit: cover;
+  z-index: 5;
+  opacity: 0;
+}
+
+.ui {
+  position: relative;
+
+  /* width: 100%;
+    height: 100%; */
+  /* background-color: rebeccapurple; */
+  margin: 10px;
 }
 
 .ui img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 50;
-  
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  z-index: 5;
 }
 
 .ui canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 80;
-    /* background-color: blue; */
-}
+  position: absolute;
+  top: 0;
+  left: 0;
 
+  z-index: 80;
+  /* background-color: blue; */
+}

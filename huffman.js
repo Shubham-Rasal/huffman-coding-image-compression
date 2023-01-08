@@ -8,21 +8,38 @@ class HuffmanNode {
 }
 
 class HuffmanCoding {
-  constructor(data) {
+  // constructor(data) {
+  //   this.data = data;
+  //   this.tree = null;
+  //   this.frequency = {};
+  //   this.codes = {};
+  //   this.encoded = "";
+  //   this.decoded = [];
+  //   // this.getFrequency();
+  //   // this.getCodes();
+  //   // this.encode();
+  //   // this.decode();
+  //   // this.getTree();
+  // }
+  constructor(frequencies , encoded , data){
     this.data = data;
     this.tree = null;
-    this.frequency = {};
     this.codes = {};
-    this.encoded = "";
     this.decoded = [];
-    this.getFrequency();
-    this.getCodes();
-    this.encode();
-    this.decode();
-    // this.getTree();
+    this.frequency = frequencies;
+    this.encoded = encoded;
+    // this.tree = this.getCodes(frequencies);
+    // this.decode();
   }
 
   getFrequency() {
+    // one equal sign makes all the difference
+    for(let i = 0;i < 256;i++){
+      this.frequency[i] = 0;
+    }
+
+    console.log(this.frequency)
+
     this.data.forEach((byte) => {
       if (this.frequency[byte]) {
         this.frequency[byte]++;
@@ -30,22 +47,23 @@ class HuffmanCoding {
         this.frequency[byte] = 1;
       }
     });
-
     return this.frequency;
   }
-
+  
   getTotalFrequency() {
     return Object.values(this.frequency).reduce((a, b) => {
       return a + b;
     });
   }
-
+  
   getCodes() {
+    
+    // console.table(this.frequency)
     const sorted = Object.entries(this.frequency).sort((a, b) => {
       return a[1] - b[1];
     });
 
-    //convert to HuffmanNode
+    //convert to HuffmanNode using the concept of min heap
     let nodes = [];
     sorted.forEach((node, index) => {
       nodes.push(new HuffmanNode(node[0], node[1], null, null));
@@ -53,6 +71,7 @@ class HuffmanCoding {
 
     const tree = this.buildTree(nodes);
     this.tree = tree;
+    console.log(tree);
 
     this.buildCodes(tree);
   }
@@ -110,6 +129,8 @@ class HuffmanCoding {
     let current = this.getTree();
     let counter = 0;
 
+
+
     for (let i = 0; i < this.encoded.length; i++) {
       if (this.encoded[i] === "0") {
         current = current.left;
@@ -119,6 +140,7 @@ class HuffmanCoding {
 
       if (current.left === null && current.right === null) {
         this.decoded.push(parseInt(current.data));
+        // console.log(current.data);
         current = this.getTree();
         counter++;
       }

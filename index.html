@@ -11,7 +11,7 @@
     <h1>Image Compression using Huffman Coding</h1>
     <div class="buttons">
       <h2>Upload an image</h2>
-      <input type="file" id="file" accept="image/*" />
+      <input type="file" id="file" multiple />
       <button id="upload">Upload</button>
       <button id="compress">Compress</button>
       <button id="decompress">Decompress</button>
@@ -22,6 +22,7 @@
 
       </canvas>
     </div>
+    <script src="dist/FileSaver.min.js"></script>
     <script src="dist/jszip.min.js"></script>
     <script src="file.js"></script>
     <script src="huffman.js"></script>

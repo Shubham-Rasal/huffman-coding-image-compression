@@ -10,112 +10,192 @@ function convertToBinaryString(number) {
   return binary;
 }
 
-// console.log(convertToBinaryString(16));
-const dpi = window.devicePixelRatio;
-const target = 300;
+function compress(string) {
+  const remaining = string.length % 8;
+  console.log(remaining);
+
+  let extraCount = 8 - remaining;
+  let extra = "";
+  let i = extraCount;
+  while (i--) extra += "0";
+  string = string + extra;
+
+
+  console.log(string.length % 8);
+
+   // //get 8 char long chunks of encoded data and convert to numbers
+   const encodedData = [];
+   for (let i = 0; i < string.length; i += 8) {
+     encodedData.push(parseInt(string.slice(i, i + 8), 2));
+   }
+
+   console.log("Encoded data from compress", encodedData);
+
+  const data = {
+    compressed : encodedData,
+    extra : extraCount
+  }
+
+  return data;
+}
+
+function decompress(encodedData , extra) {
+
+  //get back the image from the array of numbers
+  let binaryString = "";
+  for (let i = 0; i < encodedData.length; i++) {
+    binaryString += convertToBinaryString(encodedData[i]);
+  }
+
+  // console.log("Binary string", binaryString);
+
+  binaryString = binaryString.slice(0, binaryString.length - extra);
+
+  console.log("String after trimming : ", binaryString.length)
+  return binaryString;
+
+  
+}
 
 const image = document.getElementsByTagName("img")[0];
-image.style.width = `${target}px`;
-image.style.height = `${target}px`;
-
-// hide the image
-// image.style.display = "none";
-
-// console.log(image);
 const canvas = document.getElementsByTagName("canvas")[0];
 const ctx = canvas.getContext("2d");
 
+let test = "";
+
 function copyToCanvas() {
-  canvas.width = target * window.devicePixelRatio;
-  canvas.height = target * window.devicePixelRatio;
-
-  canvas.style.width = `${target}px`;
-  canvas.style.height = `${target}px`;
-
   const img = new Image();
   img.src = image.src;
   canvas.imageSmoothingEnabled = false;
-  ctx.drawImage(img, 0, 0, image.width * dpi, image.height * dpi);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   console.log(imageData.data);
 }
 
 const compress_button = document.getElementById("compress");
-compress_button.addEventListener("click", () => {
+compress_button.addEventListener("click", async () => {
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  console.log(imageData);
   // //appply huffman coding
-  const huffman = new HuffmanCoding(imageData.data);
+  const huffman = new HuffmanCoding([], "", imageData.data);
+
+  huffman.getFrequency();
+  huffman.getCodes();
 
   // //encode image data
+  huffman.encode();
   const encodedString = huffman.encoded;
   console.log("Encoded", encodedString);
   console.log("Encoded length", encodedString.length);
 
-  // //get 8 char long chunks of encoded data and convert to numbers
-  const encodedData = [];
-  for (let i = 0; i < encodedString.length; i += 8) {
-    encodedData.push(parseInt(encodedString.slice(i, i + 8), 2));
-  }
 
-  console.log("Encoded data", encodedData);
+  //compress string 
+  let {compressed , extra} = compress(encodedString);
 
+  console.log("compressed :",compressed);
+
+
+  const decompressedString = decompress(compressed , extra);
+  console.log(decompressedString == encodedString)
+
+  test = decompressedString
+
+
+
+  //store the frequencies in a json file
+  // huffman.frequency[256] = extra;
+  // const frequencies = JSON.stringify(huffman.frequency);  
+  
+  console.log(huffman.frequency);
+
+  const h2 = new HuffmanCoding(huffman.frequency, decompressedString, [])
+  h2.getCodes();
+  console.log(h2.codes)
+  h2.decode();
+
+  console.log("Decoded data", h2.decoded);
+
+
+  // //decode image data
+  huffman.decode();
   const decodedData = huffman.decoded;
 
   console.log("Decoded data", decodedData);
 
-  //store the data in a binary file
-  const blob = new Blob([new Uint8Array(encodedData)], {
+  compressed = new Uint8Array(compressed);
+
+ 
+  //store the compressed string in a bin file
+  const blob = new Blob([compressed], {
     type: "application/octet-stream",
   });
 
-  //store the codes in a json file
-  const codes = JSON.stringify(huffman.codes);
-  const codesBlob = new Blob([codes], {
+  console.log("blob", blob);
+
+  // //store the frequencies in a json file
+  huffman.frequency[256] = extra;
+  const frequencies = JSON.stringify(huffman.frequency);   
+
+  const codesBlob = new Blob([frequencies], {
     type: "application/json",
   });
 
-  //make a zip file of the binary file and the json file
+  // make a zip file of the binary file and the json file
+  zip.file("compressed.bin", blob);
+  zip.file("frequencies.json", codesBlob);
+  const content = await zip.generateAsync({ type: "blob" });
+  saveAs(content, "compressed.zip");
 
-  //download the codes
-  // const codesLink = document.createElement("a");
-  // codesLink.href = window.URL.createObjectURL(codesBlob);
-  // codesLink.download = "codes.json";
-  // codesLink.innerText = "Download Codes";
-  // document.body.appendChild(codesLink);
-
-  // //download the file
-  // const link = document.createElement("a");
-  // link.href = window.URL.createObjectURL(blob);
-  // link.download = "compressed.bin";
-  // link.innerText = "Download";
-  // document.body.appendChild(link);
-
-  // const test = encodedData[0];
-
-  //get binary value of test using inbuilt function
-  // const bin = test.toString(2);
-  // console.log(bin);
-
-  // //get back the image from the array of numbers
-  // let binaryString = "";
-  // for (let i = 0; i < encodedData.length; i++) {
-  //   binaryString += convertToBinaryString(encodedData[i]);
-  // }
-
-  // console.log("Binary string", binaryString);
 });
 
 const decompress_button = document.getElementById("decompress");
-decompress_button.addEventListener("click", () => {
-  //get the file
-  const file = document.getElementById("file").files[0];
-  const reader = new FileReader();
-  reader.readAsArrayBuffer(file);
-  reader.onload = () => {
-    const data = new Uint8Array(reader.result);
-    console.log(data);
-    //decode the data
-  };
+decompress_button.addEventListener("click", async () => {
+  
+  const extra = jsonFileData[256];
+
+  //trim the array
+  jsonFileData = jsonFileData.slice(0, 256);
+
+  //reduce the size of the json
+  // jsonFileData = JSON.parse(JSON.stringify(jsonFileData));
+
+  console.log("json file data : ", jsonFileData);
+
+  console.log("extra : " , extra)
+  const decompressedString = decompress(binaryFileData , extra);
+
+  const h2 = new HuffmanCoding(jsonFileData, decompressedString, []);
+
+  h2.getCodes();
+
+  console.log(h2.codes)
+
+  const d = h2.decode();
+
+  console.log("Decoded data new   ", d);
+
+  // add the data ot the canvas
+  const reconstructedImageData = new ImageData(
+    new Uint8ClampedArray(4 * canvas.width * canvas.height),
+    canvas.width,
+    canvas.height
+  );
+
+  for (let i = 0; i < d.length; i++) {
+    reconstructedImageData.data[i] = d[i];
+  }
+
+  console.log("Reconstucted Image data : ", reconstructedImageData);
+
+  const imageData = ctx.createImageData(canvas.width, canvas.height);
+  imageData.data.set(reconstructedImageData.data);
+  ctx.putImageData(imageData, 0, 0);
+
+  // const img = new Image();
+  image.src = canvas.toDataURL("image/png");
+  // document.body.appendChild(img);  
+
+
 });
 
 //get rgb values of each pixel
