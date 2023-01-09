@@ -48,6 +48,39 @@ const image = document.getElementsByTagName("img")[0];
 const canvas = document.getElementsByTagName("canvas")[0];
 const ctx = canvas.getContext("2d");
 
+const originalSize = document.getElementById("originalSize");
+const compressedSize = document.getElementById("compressedSize");
+const compressionRatio = document.getElementById("compressionRatio");
+
+
+function getOriginalSize() {
+  
+  const size = canvas.width * canvas.height * 4;
+  originalSize.innerHTML = size + " bytes";
+}
+
+function getCompressedSize(c) {
+
+  console.log(c)
+
+  const com_size = c.size;
+
+  compressedSize.innerHTML = com_size + " bytes"; 
+
+}
+
+
+function getCompressionRatio() {
+  const original = originalSize.innerHTML.split(" ")[0];
+  const compressed = compressedSize.innerHTML.split(" ")[0];
+  let ratio = ((original - compressed) / original) * 100;
+  //truncate the ratio to 2 decimal places
+  ratio = Math.trunc(ratio * 100) / 100;
+  compressionRatio.innerHTML = ratio + "%";
+}
+
+
+
 
 function copyToCanvas() {
   const img = new Image();
@@ -56,6 +89,7 @@ function copyToCanvas() {
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   console.log(imageData.data);
+  getOriginalSize();
 }
 
 const compress_button = document.getElementById("compress");
@@ -91,11 +125,16 @@ compress_button.addEventListener("click", async () => {
     type: "application/json",
   });
 
+
+
   // make a zip file of the binary file and the json file
   zip.file("compressed.bin", blob);
   zip.file("frequencies.json", codesBlob);
   const content = await zip.generateAsync({ type: "blob" });
   saveAs(content, "compressed.zip");
+
+  getCompressedSize(content);
+  getCompressionRatio();
 
 });
 
