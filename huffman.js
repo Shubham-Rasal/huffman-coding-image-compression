@@ -8,19 +8,7 @@ class HuffmanNode {
 }
 
 class HuffmanCoding {
-  // constructor(data) {
-  //   this.data = data;
-  //   this.tree = null;
-  //   this.frequency = {};
-  //   this.codes = {};
-  //   this.encoded = "";
-  //   this.decoded = [];
-  //   // this.getFrequency();
-  //   // this.getCodes();
-  //   // this.encode();
-  //   // this.decode();
-  //   // this.getTree();
-  // }
+  
   constructor(frequencies , encoded , data){
     this.data = data;
     this.tree = null;
@@ -28,8 +16,6 @@ class HuffmanCoding {
     this.decoded = [];
     this.frequency = frequencies;
     this.encoded = encoded;
-    // this.tree = this.getCodes(frequencies);
-    // this.decode();
   }
 
   getFrequency() {
@@ -58,7 +44,7 @@ class HuffmanCoding {
   
   getCodes() {
     
-    // console.table(this.frequency)
+    //using heap (min heap)
     const sorted = Object.entries(this.frequency).sort((a, b) => {
       return a[1] - b[1];
     });
@@ -107,9 +93,7 @@ class HuffmanCoding {
 
   buildCodes(root, code = "") {
     if (root.data !== null) {
-      // this.codes[root.data] = { data: root.data, code: code };
       this.codes[root.data] = code;
-      //   console.log(root)
     } else {
       this.buildCodes(root.left, code + "0");
       this.buildCodes(root.right, code + "1");
@@ -117,8 +101,6 @@ class HuffmanCoding {
   }
 
   encode() {
-    // console.log(this.data.length)
-
     this.data.forEach((byte) => {
       this.encoded += this.codes[byte];
     });
@@ -127,10 +109,8 @@ class HuffmanCoding {
   decode() {
     //traverse tree and get data
     let current = this.getTree();
-    let counter = 0;
 
-
-
+    
     for (let i = 0; i < this.encoded.length; i++) {
       if (this.encoded[i] === "0") {
         current = current.left;
@@ -140,13 +120,11 @@ class HuffmanCoding {
 
       if (current.left === null && current.right === null) {
         this.decoded.push(parseInt(current.data));
-        // console.log(current.data);
         current = this.getTree();
         counter++;
       }
     }
 
-    console.log("Counter", counter);
 
     return this.decoded;
   }
