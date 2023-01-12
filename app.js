@@ -41,6 +41,8 @@ function decompress(encodedData , extra) {
   }
 
   binaryString = binaryString.slice(0, binaryString.length - extra);
+
+  return binaryString;
   
 }
 
@@ -147,6 +149,8 @@ decompress_button.addEventListener("click", async () => {
   console.log("json file data : ", jsonFileData);
 
   const decompressedString = decompress(binaryFileData , extra);
+
+  console.log("Decompressed string : ", decompressedString);
 
 
   const h2 = new HuffmanCoding(jsonFileData, decompressedString, []);

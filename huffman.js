@@ -108,6 +108,9 @@ class HuffmanCoding {
 
   decode() {
     //traverse tree and get data
+
+    console.log(this.encoded);
+
     let current = this.getTree();
 
     
@@ -121,7 +124,7 @@ class HuffmanCoding {
       if (current.left === null && current.right === null) {
         this.decoded.push(parseInt(current.data));
         current = this.getTree();
-        counter++;
+        // counter++;
       }
     }
 
